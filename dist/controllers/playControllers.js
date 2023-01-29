@@ -50,27 +50,17 @@ export const answerQuestion = async (req, res) => {
     if (!req.body.answer)
         return res.status(400).json({ message: "Missing answer" });
     const key = req.user?._id;
-    redisClient.get(key).then((redisRes) => {
+    redisClient.get(key).then(async (redisRes) => {
         if (!redisRes)
             return res.status(400).json({ message: "No quiz selected" });
         const questions = JSON.parse(redisRes);
         const question = questions[0];
         if (question.answer === req.body.answer) {
-            redisClient.incr(key + "-score").then((res) => {
-                console.log(res);
-            });
-            let score = redisClient.get(key + "-score");
-            redisClient.del(key + "-score").then((res) => {
-                console.log(res);
-            });
-            questions.shift();
-            redisClient.set(key, JSON.stringify(questions)).then((res) => {
-                console.log(res);
-            });
+            await redisClient.incr(key + "-score");
+            let score = await redisClient.get(key + "-score");
+            await shiftArraySetQuestion(questions, key);
             if (questions.length === 0) {
-                redisClient.del(key).then((res) => {
-                    console.log(res);
-                });
+                await clearKeys(key);
                 return res.status(200).json({
                     message: "Correct answer ! You have completed the quiz !",
                     score: score,
@@ -83,18 +73,10 @@ export const answerQuestion = async (req, res) => {
             });
         }
         else {
-            let score = redisClient.get(key + "-score");
-            questions.shift();
-            redisClient.set(key, JSON.stringify(questions)).then((res) => {
-                console.log(res);
-            });
+            let score = await redisClient.get(key + "-score");
+            await shiftArraySetQuestion(questions, key);
             if (questions.length === 0) {
-                redisClient.del(key).then((res) => {
-                    console.log(res);
-                });
-                redisClient.del(key + "-score").then((res) => {
-                    console.log(res);
-                });
+                await clearKeys(key);
                 return res.status(200).json({
                     message: "Wrong answer ! You have completed the quiz !",
                     score: score,
@@ -104,4 +86,12 @@ export const answerQuestion = async (req, res) => {
         }
     });
 };
+async function clearKeys(key) {
+    await redisClient.del(key);
+    await redisClient.del(key + "-score");
+}
+async function shiftArraySetQuestion(questions, key) {
+    questions.shift();
+    await redisClient.set(key, JSON.stringify(questions));
+}
 //# sourceMappingURL=playControllers.js.map

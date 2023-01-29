@@ -41,7 +41,11 @@ export const getQuestion = async (req, res) => {
         const question = questions[0];
         return res
             .status(200)
-            .json({ question: question.question, Options: question.options });
+            .json({
+            question: question.question,
+            Options: question.options,
+            questionsLeft: questions.length,
+        });
     });
 };
 export const answerQuestion = async (req, res) => {
@@ -82,7 +86,13 @@ export const answerQuestion = async (req, res) => {
                     score: score,
                 });
             }
-            return res.status(400).json({ message: "Wrong answer" });
+            return res
+                .status(400)
+                .json({
+                message: "Wrong answer",
+                currentScore: score,
+                questionsLeft: questions.length,
+            });
         }
     });
 };
@@ -93,5 +103,6 @@ async function clearKeys(key) {
 async function shiftArraySetQuestion(questions, key) {
     questions.shift();
     await redisClient.set(key, JSON.stringify(questions));
+    await redisClient.expire(key, 60 * 60);
 }
 //# sourceMappingURL=playControllers.js.map

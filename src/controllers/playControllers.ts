@@ -55,7 +55,11 @@ export const getQuestion = async (req: Request, res: Response) => {
 
     return res
       .status(200)
-      .json({ question: question.question, Options: question.options });
+      .json({
+        question: question.question,
+        Options: question.options,
+        questionsLeft: questions.length,
+      });
   });
 };
 
@@ -105,7 +109,13 @@ export const answerQuestion = async (req: Request, res: Response) => {
         });
       }
 
-      return res.status(400).json({ message: "Wrong answer" });
+      return res
+        .status(400)
+        .json({
+          message: "Wrong answer",
+          currentScore: score,
+          questionsLeft: questions.length,
+        });
     }
   });
 };
@@ -117,4 +127,5 @@ async function clearKeys(key: string) {
 async function shiftArraySetQuestion(questions: Question[], key: string) {
   questions.shift();
   await redisClient.set(key, JSON.stringify(questions));
+  await redisClient.expire(key, 60 * 60);
 }

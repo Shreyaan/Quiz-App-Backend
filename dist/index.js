@@ -5,8 +5,8 @@ dotenv.config();
 import mongoose from "mongoose";
 import loginRoutes from "./routes/auth.js";
 import quizRoutes from "./routes/quiz.js";
+import playRoutes from "./routes/play.js";
 import { checkToken } from "./middleware/auth.js";
-// import { redisClient } from "./utils/redisClient.js";
 let MONGODB_URL = process.env.MONGODB_URL;
 mongoose.set("strictQuery", true);
 mongoose
@@ -17,18 +17,13 @@ mongoose
     .catch((err) => {
     console.log("Error connecting to MongoDB: ", err.message);
 });
-// redisClient.set("key", "value").then((res) => {
-//   console.log(res);
-// });
-// redisClient.expire("key", 60 * 60).then((res) => {
-//   console.log(res);
-// });
 const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: "50mb" }));
 app.use("/api/v1/auth", loginRoutes);
 app.use("/api/v1/quiz", checkToken, quizRoutes);
+app.use("/api/v1/play", checkToken, playRoutes);
 app.get("/", (_req, res) => {
     res.send("Hello World!");
 });

@@ -95,4 +95,18 @@ export const forgotPassword = async (req, res) => {
                 .json({ error: error.code, message: error.message });
     });
 };
+//show user profile
+export const showProfile = async (req, res) => {
+    const { _id } = req.params;
+    if (!_id) {
+        return res.status(400).json({ message: "Missing id" });
+    }
+    User.findOne({ _id }, (err, user) => {
+        if (err)
+            return res.status(500).json({ message: err.message });
+        if (!user)
+            return res.status(404).json({ message: "User not found" });
+        return res.status(200).json({ name: user.name, role: user.role });
+    });
+};
 //# sourceMappingURL=authController.js.map

@@ -11,8 +11,7 @@ import User from "../models/User.js";
 import { UserModel } from "types.js";
 
 export const signup = async (req: Request, res: Response) => {
-    
-  const { email, password, name } = req.body;  
+  const { email, password, name } = req.body;
 
   if (!email || !password || !name) {
     return res.status(400).json({ message: "Missing email, password or name" });
@@ -53,7 +52,7 @@ export const login = async (req: Request, res: Response) => {
   if (!email || !password) {
     return res.status(400).json({ message: "Missing email or password" });
   }
-  let userObj: UserModel
+  let userObj: UserModel;
 
   signInWithEmailAndPassword(auth, email, password)
     .then(async (userCred) => {
@@ -69,16 +68,13 @@ export const login = async (req: Request, res: Response) => {
             // create JWT
             userObj = user;
             let jwtSecret = process.env.JWT_SECRET as string;
-            jwt.sign({ user }, jwtSecret, (_err: any, token: any)  => {
-             
-              
-              if (_err)
-                return res.status(500).json({ message: _err.message });
+            jwt.sign({ user }, jwtSecret, (_err: any, token: any) => {
+              if (_err) return res.status(500).json({ message: _err.message });
               return res.json({
                 token,
                 role: userObj.role,
                 email: userObj.email,
-                name : userObj.name,
+                name: userObj.name,
               });
             });
           }
@@ -111,4 +107,20 @@ export const forgotPassword = async (req: Request, res: Response) => {
           .status(500)
           .json({ error: error.code, message: error.message });
     });
+};
+
+//show user profile
+
+export const showProfile = async (req: Request, res: Response) => {
+  const { _id } = req.params;
+
+  if (!_id) {
+    return res.status(400).json({ message: "Missing id" });
+  }
+
+  User.findOne({ _id }, (err: { message: any }, user: UserModel) => {
+    if (err) return res.status(500).json({ message: err.message });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.status(200).json({ name : user.name, role : user.role });
+  });
 };

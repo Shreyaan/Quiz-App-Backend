@@ -69,9 +69,11 @@ export const login = async (req: Request, res: Response) => {
             // create JWT
             userObj = user;
             let jwtSecret = process.env.JWT_SECRET as string;
-            jwt.sign({ user }, jwtSecret, (err_1: any, token_1: any) => {
-              if (err_1)
-                return res.status(500).json({ message: err_1.message });
+            jwt.sign({ user }, jwtSecret, (_err: any, token: any)  => {
+             
+              
+              if (_err)
+                return res.status(500).json({ message: _err.message });
               return res.json({
                 token,
                 role: userObj.role,

@@ -1,11 +1,10 @@
 import { Router } from "express";
-import { createQuiz, getQuiz } from "../controllers/quizController.js";
+import { createQuiz, getQuiz, updateQuiz, getQuizBySlug, deleteQuiz } from "../controllers/quizController.js";
 const router = Router();
-// router.post('/register', signup);
-// router.post('/login', login);
-// router.post('/forgot', forgotPassword);
-// router.get('/profile', authController.getProfile);
 router.get('/', getQuiz);
 router.post('/new', createQuiz);
+router.get('/:slug', getQuizBySlug);
+router.put('/:slug', updateQuiz);
+router.delete('/:slug', deleteQuiz);
 export default router;
 //# sourceMappingURL=quiz.js.map

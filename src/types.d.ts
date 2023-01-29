@@ -8,6 +8,7 @@ export interface UserModel {
   name?: string | undefined;
   id?: string | undefined;
   updated_at?: Date | undefined;
+  _id: string;
 }
 
 export interface Question {
@@ -24,6 +25,7 @@ export interface Question {
   export interface Questions {
     Name: string;
     Slug: string;
+    created_by: string;
     questions: Question[];
   }
   
@@ -32,6 +34,10 @@ export interface Question {
     user: UserModel;
 }
 
-interface UserRequest extends Request {
-  user?: any;
+declare global {
+  namespace Express {
+   export interface Request {
+      user?: UserModel;
+    }
+  }
 }

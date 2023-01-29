@@ -4,8 +4,9 @@
   "main": "index.js",
   "author": "Shreyaan",
   "license": "MIT",
+  "type": "module",
   "private": true,
-   "scripts": {
+  "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
     "dev": "tsc -w & nodemon dist/index.js"
@@ -23,6 +24,7 @@
     "firebase": "^9.16.0",
     "mongoose": "^6.8.2",
     "nanoid": "^4.0.0",
+    "redis": "^4.6.3",
     "uuid": "^9.0.0"
   }
 }

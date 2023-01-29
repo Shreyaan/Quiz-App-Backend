@@ -41,8 +41,6 @@ export const checkToken = async (
 
     req.user = decoded.user;
     
-    console.log(req.user);
-    
 
     next();
   } catch (error) {

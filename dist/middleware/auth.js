@@ -22,7 +22,6 @@ export const checkToken = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         //this works because of type in types.d.ts check it out
         req.user = decoded.user;
-        console.log(req.user);
         next();
     }
     catch (error) {

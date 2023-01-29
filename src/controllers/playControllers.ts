@@ -76,7 +76,16 @@ export const answerQuestion = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Missing answer" });
   const key = req.user?._id;
 
- await redisClient.get(key).then(async (redisRes) => {
+  if (req.body.answer.length > 1)
+    return res
+      .status(400)
+      .json({ message: "You can only answer one question at a time" });
+
+
+  if (!req.body.answer.match(/^[a-d]$/))
+    return res.status(400).json({ message: "Answer must be a/b/c/d" });
+
+  await redisClient.get(key).then(async (redisRes) => {
     if (!redisRes) return res.status(400).json({ message: "No quiz selected" });
     const questions: Question[] = JSON.parse(redisRes);
     const question = questions[0];
@@ -125,15 +134,15 @@ export const answerQuestion = async (req: Request, res: Response) => {
     }
   });
 };
-async function saveScore(key: string, req:Request, score: string | null) {
-    let quizSlug = await redisClient.get(key + "-quizSlug");
+async function saveScore(key: string, req: Request, score: string | null) {
+  let quizSlug = await redisClient.get(key + "-quizSlug");
 
-    const highScore = new HighScore({
-        quizSlug: quizSlug,
-        playerId: req.user?._id,
-        score: score,
-    });
-    await highScore.save();
+  const highScore = new HighScore({
+    quizSlug: quizSlug,
+    playerId: req.user?._id,
+    score: score,
+  });
+  await highScore.save();
 }
 
 async function clearKeys(key: string) {

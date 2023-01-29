@@ -59,6 +59,12 @@ export const answerQuestion = async (req, res) => {
     if (!req.body.answer)
         return res.status(400).json({ message: "Missing answer" });
     const key = req.user?._id;
+    if (req.body.answer.length > 1)
+        return res
+            .status(400)
+            .json({ message: "You can only answer one question at a time" });
+    if (!req.body.answer.match(/^[a-d]$/))
+        return res.status(400).json({ message: "Answer must be a/b/c/d" });
     await redisClient.get(key).then(async (redisRes) => {
         if (!redisRes)
             return res.status(400).json({ message: "No quiz selected" });

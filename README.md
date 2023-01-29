@@ -2,7 +2,7 @@
 
 # **Quiz App Backend**
 
-The backend for the Quiz App is a server-side application built using Node.js, MongoDB, Firebase, and Redis. The main purpose of the backend is to provide an API for the front-end to interact with. The backend will store quiz data, authentication data, and current running game data.
+The backend for the Quiz App is a server-side application that provides an API for the front-end to interact with. It uses Firebase for authentication, MongoDB as the main database for storing quiz data and highscores, and Redis for storing and tracking current running games. The backend enables users to sign up, sign in, create their own quizzes with full CRUD support, play any quiz from the list of available quizzes, and track their scores with a highscore system. The game session lasts 60 minutes after which it is deleted. The tech stack used to build the backend includes Firebase, MongoDB, Redis, Node.js, and Express.
 
 ## **Features**
 

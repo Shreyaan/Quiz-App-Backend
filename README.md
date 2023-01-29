@@ -33,6 +33,9 @@ The backend uses Redis to store and track current running games. When a user sta
 5. The front-end sends another GET request to the backend's question endpoint to receive the next question.
 6. Steps 3 and 4 are repeated until the user has answered all the questions or the session has expired.
 
+## **Endpoints**
+ https://documenter.getpostman.com/view/19587055/2s935hQSW8
+
 ## **Tech Stack**
 
 - Firebase for authentication

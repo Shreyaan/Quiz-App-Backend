@@ -3,7 +3,16 @@ import slugify from "slugify";
 export const getQuiz = async (req, res) => {
     try {
         const quiz = await Quiz.find({});
-        res.status(200).json(quiz);
+        let quizListWithoutQuestions = quiz.map((quiz) => {
+            return {
+                Name: quiz.Name,
+                Slug: quiz.Slug,
+                created_by: quiz.created_by,
+                quizId: quiz._id,
+                image: quiz.image,
+            };
+        });
+        res.status(200).json(quizListWithoutQuestions);
     }
     catch (err) {
         res.status(404).json({ message: err?.message });

@@ -6,8 +6,16 @@ import { Question, Questions } from "types.js";
 export const getQuiz = async (req: Request, res: Response) => {
   try {
     const quiz = await Quiz.find({});
-
-    res.status(200).json(quiz);
+    let quizListWithoutQuestions = quiz.map((quiz) => {
+      return {
+        Name: quiz.Name,
+        Slug: quiz.Slug,
+        created_by: quiz.created_by,
+        quizId: quiz._id,
+        image: quiz.image,
+      };
+    });
+    res.status(200).json(quizListWithoutQuestions);
   } catch (err: any) {
     res.status(404).json({ message: err?.message });
   }
@@ -30,7 +38,7 @@ export const createQuiz = async (req: Request, res: Response) => {
 
   quiz.Slug = slugify(quiz.Name, { lower: true });
 
-  if (req.user?.username) quiz.created_by = req.user.username
+  if (req.user?.username) quiz.created_by = req.user.username;
 
   const newQuiz = new Quiz(quiz);
   try {

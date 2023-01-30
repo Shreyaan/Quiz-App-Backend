@@ -102,12 +102,14 @@ export const answerQuestion = async (req: Request, res: Response) => {
 
         return res.status(200).json({
           message: "Correct answer ! You have completed the quiz !",
+          isCorrect: true,
           score: score,
         });
       }
       return res.status(200).json({
         message:
           "Correct answer ! Go to /quiz/question to get the next question",
+          isCorrect: true,
         currentScore: score,
         questionsLeft: questions.length,
       });
@@ -122,12 +124,14 @@ export const answerQuestion = async (req: Request, res: Response) => {
 
         return res.status(200).json({
           message: "Wrong answer ! You have completed the quiz !",
+          isCorrect: false,
           score: score,
         });
       }
 
       return res.status(200).json({
         message: "Wrong answer. Go to /quiz/question to get the next question",
+        isCorrect: false,
         currentScore: score,
         questionsLeft: questions.length,
       });

@@ -25,6 +25,7 @@ export interface Question {
   export interface Questions {
     Name: string;
     Slug: string;
+    image: string;
     created_by: string;
     questions: Question[];
   }

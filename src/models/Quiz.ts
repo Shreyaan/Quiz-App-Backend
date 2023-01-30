@@ -10,6 +10,10 @@ const QuizSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  image: {
+    type: String,
+    required: true,
+  },
   created_by: {
     type: String,
     required: true,

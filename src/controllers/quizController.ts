@@ -20,6 +20,14 @@ export const createQuiz = async (req: Request, res: Response) => {
 
   const quiz: Questions = req.body;
 
+  if (quiz.questions.length < 5) {
+    return res.status(400).json({ message: "Minimum 5 questions required" });
+  }
+
+  if (quiz.questions.length > 50) {
+    return res.status(400).json({ message: "Maximum 50 questions allowed" });
+  }
+
   quiz.Slug = slugify(quiz.Name, { lower: true });
 
   if (req.user?._id) quiz.created_by = req.user._id;
@@ -49,9 +57,8 @@ export const getQuizBySlug = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "Quiz not found" });
   }
 
- return res.status(200).json(quiz);
+  return res.status(200).json(quiz);
 };
-
 
 export const updateQuiz = async (req: Request, res: Response) => {
   if (!req.params.slug) {
@@ -79,7 +86,7 @@ export const updateQuiz = async (req: Request, res: Response) => {
   );
 
   return res.status(200).json(updatedQuiz);
-}
+};
 
 export const deleteQuiz = async (req: Request, res: Response) => {
   if (!req.params.slug) {
@@ -99,4 +106,4 @@ export const deleteQuiz = async (req: Request, res: Response) => {
   await Quiz.findOneAndDelete({ Slug: req.params.slug });
 
   return res.status(200).json({ message: "Quiz deleted successfully" });
-}
+};

@@ -30,7 +30,7 @@ export const createQuiz = async (req: Request, res: Response) => {
 
   quiz.Slug = slugify(quiz.Name, { lower: true });
 
-  if (req.user?._id) quiz.created_by = req.user._id;
+  if (req.user?.username) quiz.created_by = req.user.username
 
   const newQuiz = new Quiz(quiz);
   try {
@@ -75,7 +75,7 @@ export const updateQuiz = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "Quiz not found" });
   }
 
-  if (req.user?._id !== quiz.created_by) {
+  if (req.user?.username !== quiz.created_by) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -99,7 +99,7 @@ export const deleteQuiz = async (req: Request, res: Response) => {
     return res.status(404).json({ message: "Quiz not found" });
   }
 
-  if (req.user?._id !== quiz.created_by) {
+  if (req.user?.username !== quiz.created_by) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 

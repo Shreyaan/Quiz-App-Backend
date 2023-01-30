@@ -64,8 +64,14 @@ export const getQuizBySlug = async (req: Request, res: Response) => {
   if (!quiz) {
     return res.status(404).json({ message: "Quiz not found" });
   }
-
-  return res.status(200).json(quiz);
+  let quizListWithoutQuestions = {
+    Name: quiz.Name,
+    Slug: quiz.Slug,
+    created_by: quiz.created_by,
+    quizId: quiz._id,
+    image: quiz.image,
+  };
+  return res.status(200).json(quizListWithoutQuestions);
 };
 
 export const updateQuiz = async (req: Request, res: Response) => {

@@ -22,7 +22,7 @@ mongoose
     console.log("Error connecting to MongoDB: ", err.message);
   });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 const app = express();
 app.use(cors());

@@ -27,7 +27,7 @@ export const signup = async (req: Request, res: Response) => {
   });
 
   User.findOne(
-    { name: username },
+    { username: username },
     (err: { message: any }, existingUser: any) => {
       if (err) return res.status(500).json({ message: err.message });
       if (existingUser)

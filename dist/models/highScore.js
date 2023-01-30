@@ -4,7 +4,7 @@ const HighScore = new mongoose.Schema({
         type: String,
         required: true
     },
-    playerId: {
+    playerName: {
         type: String,
         required: true
     },

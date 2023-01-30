@@ -14,9 +14,15 @@ export const createQuiz = async (req, res) => {
         return res.status(400).json({ message: "Missing Name or Questions" });
     }
     const quiz = req.body;
+    if (quiz.questions.length < 5) {
+        return res.status(400).json({ message: "Minimum 5 questions required" });
+    }
+    if (quiz.questions.length > 50) {
+        return res.status(400).json({ message: "Maximum 50 questions allowed" });
+    }
     quiz.Slug = slugify(quiz.Name, { lower: true });
-    if (req.user?._id)
-        quiz.created_by = req.user._id;
+    if (req.user?.username)
+        quiz.created_by = req.user.username;
     const newQuiz = new Quiz(quiz);
     try {
         await newQuiz.save();
@@ -52,7 +58,7 @@ export const updateQuiz = async (req, res) => {
     if (!quiz) {
         return res.status(404).json({ message: "Quiz not found" });
     }
-    if (req.user?._id !== quiz.created_by) {
+    if (req.user?.username !== quiz.created_by) {
         return res.status(401).json({ message: "Unauthorized" });
     }
     const updatedQuiz = await Quiz.findOneAndUpdate({ Slug: req.params.slug }, req.body, { new: true });
@@ -66,7 +72,7 @@ export const deleteQuiz = async (req, res) => {
     if (!quiz) {
         return res.status(404).json({ message: "Quiz not found" });
     }
-    if (req.user?._id !== quiz.created_by) {
+    if (req.user?.username !== quiz.created_by) {
         return res.status(401).json({ message: "Unauthorized" });
     }
     await Quiz.findOneAndDelete({ Slug: req.params.slug });

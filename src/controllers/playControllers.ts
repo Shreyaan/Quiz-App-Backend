@@ -18,10 +18,10 @@ export const selectQuiz = async (req: Request, res: Response) => {
   const questions = quiz.questions;
   questions.sort(() => Math.random() - 0.5);
 
-  if (!req.user?._id)
+  if (!req.user?.username)
     return res.status(400).json({ message: "Missing user id" });
 
-  const key = req.user?._id;
+  const key = req.user?.username;
   const value = JSON.stringify(questions);
 
   redisClient.set(key, value).then((res) => {
@@ -52,9 +52,9 @@ export const selectQuiz = async (req: Request, res: Response) => {
 };
 
 export const getQuestion = async (req: Request, res: Response) => {
-  if (!req.user?._id)
+  if (!req.user?.username)
     return res.status(400).json({ message: "Missing user id" });
-  const key = req.user?._id;
+  const key = req.user?.username;
 
   redisClient.get(key).then((redisRes) => {
     if (!redisRes) return res.status(400).json({ message: "No quiz selected" });
@@ -70,11 +70,11 @@ export const getQuestion = async (req: Request, res: Response) => {
 };
 
 export const answerQuestion = async (req: Request, res: Response) => {
-  if (!req.user?._id)
-    return res.status(400).json({ message: "Missing user id" });
+  if (!req.user?.username)
+    return res.status(400).json({ message: "Missing username" });
   if (!req.body.answer)
     return res.status(400).json({ message: "Missing answer" });
-  const key = req.user?._id;
+  const key = req.user?.username;
 
   if (req.body.answer.length > 1)
     return res
@@ -157,7 +157,7 @@ async function saveScore(key: string, req: Request, score: string | null) {
 
   const highScore = new HighScore({
     quizSlug: quizSlug,
-    playerId: req.user?._id,
+    playerName: req.user?.username,
     score: score,
   });
   await highScore.save();

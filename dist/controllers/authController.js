@@ -3,9 +3,11 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswor
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 export const signup = async (req, res) => {
-    const { email, password, name } = req.body;
-    if (!email || !password || !name) {
-        return res.status(400).json({ message: "Missing email, password or name" });
+    const { email, password, username } = req.body;
+    if (!email || !password || !username) {
+        return res
+            .status(400)
+            .json({ message: "Missing email, password or username" });
     }
     // Check if user already exists
     User.findOne({ email }, (err, existingUser) => {
@@ -14,13 +16,19 @@ export const signup = async (req, res) => {
         if (existingUser)
             return res.status(400).json({ message: "Email already in use" });
     });
+    User.findOne({ username: username }, (err, existingUser) => {
+        if (err)
+            return res.status(500).json({ message: err.message });
+        if (existingUser)
+            return res.status(400).json({ message: "Username already in use" });
+    });
     createUserWithEmailAndPassword(auth, email, password)
         .then((user) => {
         // Store the user's data in MongoDB
         const newUser = new User({
             id: user.user?.uid,
             email: email,
-            name: name,
+            username: username,
         });
         newUser.save((err) => {
             if (err)
@@ -62,7 +70,7 @@ export const login = async (req, res) => {
                         token,
                         role: userObj.role,
                         email: userObj.email,
-                        name: userObj.name,
+                        username: userObj.username,
                     });
                 });
             });
@@ -106,7 +114,7 @@ export const showProfile = async (req, res) => {
             return res.status(500).json({ message: err.message });
         if (!user)
             return res.status(404).json({ message: "User not found" });
-        return res.status(200).json({ name: user.name, role: user.role });
+        return res.status(200).json({ username: user.username, role: user.role });
     });
 };
 //# sourceMappingURL=authController.js.map

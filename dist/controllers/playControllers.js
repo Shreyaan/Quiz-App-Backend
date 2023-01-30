@@ -70,6 +70,7 @@ export const answerQuestion = async (req, res) => {
             return res.status(400).json({ message: "No quiz selected" });
         const questions = JSON.parse(redisRes);
         const question = questions[0];
+        let responseObj;
         if (question?.answer === req.body.answer) {
             await redisClient.incr(key + "-score");
             let score = await redisClient.get(key + "-score");
@@ -77,18 +78,20 @@ export const answerQuestion = async (req, res) => {
             if (questions.length === 0) {
                 await saveScore(key, req, score);
                 await clearKeys(key);
-                return res.status(200).json({
+                responseObj = {
                     message: "Correct answer ! You have completed the quiz !",
                     isCorrect: true,
-                    score: score,
-                });
+                    score: score ? score : "0",
+                };
+                return res.status(200).json(responseObj);
             }
-            return res.status(200).json({
-                message: "Correct answer ! Go to /quiz/question to get the next question",
+            responseObj = {
+                message: "Correct answer. Go to /quiz/question to get the next question",
                 isCorrect: true,
-                currentScore: score,
+                currentScore: score ? score : "0",
                 questionsLeft: questions.length,
-            });
+            };
+            return res.status(200).json(responseObj);
         }
         else {
             let score = await redisClient.get(key + "-score");
@@ -96,18 +99,20 @@ export const answerQuestion = async (req, res) => {
             if (questions.length === 0) {
                 await saveScore(key, req, score);
                 await clearKeys(key);
-                return res.status(200).json({
+                responseObj = {
                     message: "Wrong answer ! You have completed the quiz !",
                     isCorrect: false,
-                    score: score,
-                });
+                    score: score ? score : "0",
+                };
+                return res.status(200).json(responseObj);
             }
-            return res.status(200).json({
+            responseObj = {
                 message: "Wrong answer. Go to /quiz/question to get the next question",
                 isCorrect: false,
-                currentScore: score,
+                currentScore: score ? score : "0",
                 questionsLeft: questions.length,
-            });
+            };
+            return res.status(200).json(responseObj);
         }
     });
 };

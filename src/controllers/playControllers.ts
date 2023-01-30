@@ -81,7 +81,6 @@ export const answerQuestion = async (req: Request, res: Response) => {
       .status(400)
       .json({ message: "You can only answer one question at a time" });
 
-
   if (!req.body.answer.match(/^[a-d]$/))
     return res.status(400).json({ message: "Answer must be a/b/c/d" });
 
@@ -89,6 +88,14 @@ export const answerQuestion = async (req: Request, res: Response) => {
     if (!redisRes) return res.status(400).json({ message: "No quiz selected" });
     const questions: Question[] = JSON.parse(redisRes);
     const question = questions[0];
+
+    let responseObj: {
+      message: string;
+      isCorrect: boolean;
+      currentScore?: string;
+      questionsLeft?: number;
+      score?: string;
+    };
 
     if (question?.answer === req.body.answer) {
       await redisClient.incr(key + "-score");
@@ -99,20 +106,23 @@ export const answerQuestion = async (req: Request, res: Response) => {
       if (questions.length === 0) {
         await saveScore(key, req, score);
         await clearKeys(key);
-
-        return res.status(200).json({
+        responseObj = {
           message: "Correct answer ! You have completed the quiz !",
           isCorrect: true,
-          score: score,
-        });
+          score: score ? score : "0",
+        };
+        return res.status(200).json(responseObj);
       }
-      return res.status(200).json({
+
+      responseObj = {
         message:
-          "Correct answer ! Go to /quiz/question to get the next question",
-          isCorrect: true,
-        currentScore: score,
+          "Correct answer. Go to /quiz/question to get the next question",
+        isCorrect: true,
+        currentScore: score ? score : "0",
         questionsLeft: questions.length,
-      });
+      };
+
+      return res.status(200).json(responseObj);
     } else {
       let score = await redisClient.get(key + "-score");
 
@@ -122,19 +132,23 @@ export const answerQuestion = async (req: Request, res: Response) => {
         await saveScore(key, req, score);
         await clearKeys(key);
 
-        return res.status(200).json({
+        responseObj = {
           message: "Wrong answer ! You have completed the quiz !",
           isCorrect: false,
-          score: score,
-        });
+          score: score ? score : "0",
+        };
+
+        return res.status(200).json(responseObj);
       }
 
-      return res.status(200).json({
+      responseObj = {
         message: "Wrong answer. Go to /quiz/question to get the next question",
         isCorrect: false,
-        currentScore: score,
+        currentScore: score ? score : "0",
         questionsLeft: questions.length,
-      });
+      };
+
+      return res.status(200).json(responseObj);
     }
   });
 };

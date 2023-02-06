@@ -61,6 +61,11 @@ export const getQuestion = async (req: Request, res: Response) => {
     const questions: Question[] = JSON.parse(redisRes);
     const question: Question = questions[0];
 
+
+    if (!question) {
+      return res.status(400).json({ message: "No questions left" });
+    }
+
     return res.status(200).json({
       question: question.question,
       Options: question.options,
@@ -116,7 +121,7 @@ export const answerQuestion = async (req: Request, res: Response) => {
 
       responseObj = {
         message:
-          "Correct answer. Go to /quiz/question to get the next question",
+          "Correct answer.",
         isCorrect: true,
         currentScore: score ? score : "0",
         questionsLeft: questions.length,
@@ -142,7 +147,7 @@ export const answerQuestion = async (req: Request, res: Response) => {
       }
 
       responseObj = {
-        message: "Wrong answer. Go to /quiz/question to get the next question",
+        message: "Wrong answer.",
         isCorrect: false,
         currentScore: score ? score : "0",
         questionsLeft: questions.length,

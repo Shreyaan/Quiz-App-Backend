@@ -41,7 +41,7 @@ export const getQuestion = async (req, res) => {
     if (!req.user?.username)
         return res.status(400).json({ message: "Missing user id" });
     const key = req.user?.username;
-    redisClient.get(key).then((redisRes) => {
+    redisClient.get(key).then(async (redisRes) => {
         if (!redisRes)
             return res.status(400).json({ message: "No quiz selected" });
         const questions = JSON.parse(redisRes);
@@ -49,7 +49,9 @@ export const getQuestion = async (req, res) => {
         if (!question) {
             return res.status(400).json({ message: "No questions left" });
         }
+        let quizSlug = await redisClient.get(key + "-quizSlug");
         return res.status(200).json({
+            quizSlug: quizSlug,
             question: question.question,
             Options: question.options,
             questionsLeft: questions.length,
@@ -74,12 +76,13 @@ export const answerQuestion = async (req, res) => {
         const questions = JSON.parse(redisRes);
         const question = questions[0];
         let responseObj;
+        let quizSlug = req.body.quizSlug;
         if (question?.answer === req.body.answer) {
             await redisClient.incr(key + "-score");
             let score = await redisClient.get(key + "-score");
             await shiftArraySetQuestion(questions, key);
             if (questions.length === 0) {
-                await saveScore(key, req, score);
+                await saveScore(key, req, score, quizSlug);
                 await clearKeys(key);
                 responseObj = {
                     message: "Correct answer ! You have completed the quiz !",
@@ -100,7 +103,7 @@ export const answerQuestion = async (req, res) => {
             let score = await redisClient.get(key + "-score");
             await shiftArraySetQuestion(questions, key);
             if (questions.length === 0) {
-                await saveScore(key, req, score);
+                await saveScore(key, req, score, quizSlug);
                 await clearKeys(key);
                 responseObj = {
                     message: "Wrong answer ! You have completed the quiz !",
@@ -119,16 +122,25 @@ export const answerQuestion = async (req, res) => {
         }
     });
 };
-async function saveScore(key, req, score) {
-    let quizSlug = await redisClient.get(key + "-quizSlug");
+async function saveScore(key, req, score, quizSlug) {
+    console.log(quizSlug);
+    if (!quizSlug) {
+        quizSlug = await redisClient.get(key + "-quizSlug");
+    }
     if (!quizSlug)
         return;
-    const highScore = new HighScore({
-        quizSlug: quizSlug,
-        playerName: req.user?.username,
-        score: score,
-    });
-    await highScore.save();
+    try {
+        const highScore = new HighScore({
+            quizSlug: quizSlug,
+            playerName: req.user?.username,
+            score: score,
+        });
+        await highScore.save();
+    }
+    catch (error) {
+        console.log(error);
+    }
+    console.log("score saved");
 }
 async function clearKeys(key) {
     await redisClient.del(key);

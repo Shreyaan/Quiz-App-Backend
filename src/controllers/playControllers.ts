@@ -69,7 +69,7 @@ export const getQuestion = async (req: Request, res: Response) => {
   });
 };
 
-export const answerQuestion = async (req: Request, res: Response) => {
+export const answerQuestion = async (req: Request, res: Response) => {  
   if (!req.user?.username)
     return res.status(400).json({ message: "Missing username" });
   if (!req.body.answer)
@@ -154,7 +154,7 @@ export const answerQuestion = async (req: Request, res: Response) => {
 };
 async function saveScore(key: string, req: Request, score: string | null) {
   let quizSlug = await redisClient.get(key + "-quizSlug");
-
+  if (!quizSlug) return;
   const highScore = new HighScore({
     quizSlug: quizSlug,
     playerName: req.user?.username,

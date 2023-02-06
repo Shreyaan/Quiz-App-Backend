@@ -118,6 +118,8 @@ export const answerQuestion = async (req, res) => {
 };
 async function saveScore(key, req, score) {
     let quizSlug = await redisClient.get(key + "-quizSlug");
+    if (!quizSlug)
+        return;
     const highScore = new HighScore({
         quizSlug: quizSlug,
         playerName: req.user?.username,

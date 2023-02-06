@@ -1,5 +1,8 @@
 import Quiz from "../models/Quiz.js";
 import slugify from "slugify";
+import sharp from "sharp";
+import { storage } from "../utils/firebase-init.js";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
 export const getQuiz = async (req, res) => {
     try {
         const quiz = await Quiz.find({});
@@ -17,6 +20,33 @@ export const getQuiz = async (req, res) => {
     catch (err) {
         res.status(404).json({ message: err?.message });
     }
+};
+export const uploadImg = async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+    }
+    const uploadedFile = req.file;
+    if (uploadedFile.mimetype !== "image/jpeg" &&
+        uploadedFile.mimetype !== "image/png") {
+        return res.status(400).json({ message: "Only jpeg and png files allowed" });
+    }
+    if (uploadedFile.size > 1000000) {
+        return res.status(400).json({ message: "File size too large" });
+    }
+    const fileName = uploadedFile.originalname.split(".")[0];
+    const fileExt = uploadedFile.originalname.split(".")[1];
+    if (fileExt !== "png" && fileExt !== "jpg" && fileExt !== "jpeg")
+        return res
+            .status(400)
+            .json({ message: "Only png, jpg and jpeg files allowed" });
+    console.log(fileExt, fileName);
+    const resizedImg = await sharp(uploadedFile.buffer)
+        .webp({ quality: 90 })
+        .toBuffer();
+    const storageRef = ref(storage, `images/${fileName}-${Date.now()}` + "." + "webp");
+    const uploadTask = await uploadString(storageRef, resizedImg.toString("base64"), "base64");
+    const downloadURL = await getDownloadURL(uploadTask.ref);
+    res.status(200).json({ message: "Image uploaded", url: downloadURL });
 };
 export const createQuiz = async (req, res) => {
     if (!req.body.Name || !req.body.questions) {

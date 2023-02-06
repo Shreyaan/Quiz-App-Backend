@@ -13,13 +13,13 @@ export interface UserModel {
 
 export interface Question {
   question: string;
-  options: {
+  options?: {
     a: string;
     b: string;
     c: string;
     d: string;
   };
-  answer: string;
+  answer?: string;
 }
 
 export interface Questions {

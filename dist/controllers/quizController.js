@@ -84,12 +84,20 @@ export const getQuizBySlug = async (req, res) => {
     if (!quiz) {
         return res.status(404).json({ message: "Quiz not found" });
     }
+    let questions = quiz.questions;
+    questions = questions.map((question) => {
+        return {
+            question: question.question,
+            options: question.options,
+        };
+    });
     let quizListWithoutQuestions = {
         Name: quiz.Name,
         Slug: quiz.Slug,
         created_by: quiz.created_by,
         quizId: quiz._id,
         image: quiz.image,
+        questions,
     };
     return res.status(200).json(quizListWithoutQuestions);
 };

@@ -6,6 +6,8 @@ The backend for the Quiz App is a server-side application that provides an API f
 
 demo - https://quiz-frontend-three.vercel.app/
 
+repo for frontend - https://github.com/Shreyaan/quiz-app-frontend (will try to make it into a monorepo)
+
 ## **Features**
 
 - User authentication using Firebase
